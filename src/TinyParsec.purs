@@ -1,26 +1,29 @@
 module TinyParsec where
 
 import Prelude
-import Data.List hiding (uncons, singleton)
+import Data.List hiding (uncons)
 import Data.Tuple
-import Data.String
+import Data.String as S
 import Data.Maybe
 import Control.Monad
 import Control.Applicative
 import Control.Alt
 import Data.Eulalie.Char.Predicates
 
-newtype Parser a = Parser (List Char -> List (Tuple a (List Char)))
+newtype Parser a = Parser (String -> List (Tuple a String))
 
-parse :: forall a. Parser a -> List Char -> List (Tuple a (List Char)) 
+parse :: forall a. Parser a -> String -> List (Tuple a String) 
 parse (Parser p) s = p s 
 
 item :: Parser Char
 item = Parser (\s ->
-       case s of
-            Nil -> Nil
-            (c:cs) -> fromFoldable [Tuple c cs] 
-            )
+       let
+            headTail = S.uncons s
+       in
+           case headTail of
+                Nothing -> Nil
+                Just parts -> singleton (Tuple parts.head parts.tail) 
+                )
 
 instance parserApply :: Apply Parser where
     apply (Parser q) (Parser p) = Parser  
@@ -66,14 +69,14 @@ string :: String -> Parser String
 string "" = pure ""
 string s = 
     let
-        headTail = uncons s
+        headTail = S.uncons s
     in
         case headTail of
              Nothing -> zero
              Just ht -> do
                  _ <- char ht.head
                  _ <- string ht.tail
-                 pure (singleton ht.head <> ht.tail)
+                 pure (S.singleton ht.head <> ht.tail)
 
 many :: forall a. Parser a -> Parser (List a)
 many p = many1 p <|> pure Nil
@@ -115,7 +118,7 @@ token p = do
 symb :: String -> Parser String
 symb s = token (string s)
 
-apply1 :: forall a. Parser a -> List Char -> List (Tuple a (List Char))
+apply1 :: forall a. Parser a -> String -> List (Tuple a String)
 apply1 p s = parse 
                 (do
                 _ <- space
