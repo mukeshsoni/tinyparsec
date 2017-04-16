@@ -60,7 +60,7 @@ sat p = do
     if p c then pure c else zero
 
 char :: Char → Parser Char
-char c = sat (\c1 -> c1 == c)
+char c = sat (c == _)
 
 string :: String -> Parser String
 string "" = pure ""
