@@ -1,12 +1,10 @@
 module TinyParsec where
 
 import Prelude
-import Data.List hiding (uncons)
-import Data.Tuple
+import Data.List (List(..), (:), singleton, concat, concatMap)
+import Data.Tuple (Tuple(..))
 import Data.String as S
-import Data.Maybe
-import Control.Monad
-import Control.Applicative
+import Data.Maybe (Maybe(..))
 import Control.Alt
 import Data.Eulalie.Char.Predicates
 
@@ -39,7 +37,7 @@ instance parserMap :: Functor Parser where
     map f (Parser p) = Parser (\s -> map (\(Tuple a s') -> (Tuple (f a) s')) (p s))
 
 instance parserApplicative :: Applicative Parser where
-    pure a = Parser (\s -> fromFoldable [Tuple a s])
+    pure a = Parser (\s -> singleton (Tuple a s))
 
 instance parserBind :: Bind Parser where
     bind (Parser p) f = Parser (\s -> 
@@ -107,6 +105,7 @@ chainl1 p op = do
                    rest (f a b)
                    ) <|> pure a
 
+space :: Parser (List Char)
 space = many (sat isSpace)
 
 token :: forall a. Parser a -> Parser a
