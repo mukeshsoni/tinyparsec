@@ -8,6 +8,7 @@ import Data.Maybe
 import Control.Monad
 import Control.Applicative
 import Control.Alt
+import Data.Eulalie.Char.Predicates
 
 newtype Parser a = Parser (List Char -> List (Tuple a (List Char)))
 
@@ -74,11 +75,48 @@ string s =
                  _ <- string ht.tail
                  pure (singleton ht.head <> ht.tail)
 
-many :: Parser a -> Parser (List a)
-many p = many1 p <|> pure []
+many :: forall a. Parser a -> Parser (List a)
+many p = many1 p <|> pure Nil
 
-many1 :: Parser a -> Parser (List a)
+many1 :: forall a. Parser a -> Parser (List a)
 many1 p = do
     a <- p
     la <- many p
     pure (Cons a la)
+
+sepBy :: forall a b. Parser a -> Parser b -> Parser (List a)
+sepBy p q = sepBy1 p q <|> pure Nil
+
+sepBy1 :: forall a b. Parser a -> Parser b -> Parser (List a)
+sepBy1 p q = do
+    a <- p
+    as <- many (q >>= (\_ -> p)) 
+    pure (a:as)
+    
+chainl1 :: forall a. Parser a -> Parser (a -> a -> a) -> Parser a
+chainl1 p op = do
+    a <- p
+    rest a
+      where
+          rest a = (do
+                   f <- op
+                   b <- p
+                   rest (f a b)
+                   ) <|> pure a
+
+space = many (sat isSpace)
+
+token :: forall a. Parser a -> Parser a
+token p = do
+    a <- p
+    _ <- space
+    pure a
+
+symb :: String -> Parser String
+symb s = token (string s)
+
+apply1 :: forall a. Parser a -> List Char -> List (Tuple a (List Char))
+apply1 p s = parse 
+                (do
+                _ <- space
+                p) s

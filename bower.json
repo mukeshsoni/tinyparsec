@@ -12,7 +12,8 @@
     "purescript-maybe": "^3.0.0",
     "purescript-strings": "^3.0.0",
     "purescript-tuples": "^4.0.0",
-    "purescript-lists": "^4.0.1"
+    "purescript-lists": "^4.0.1",
+    "purescript-eulalie": "^5.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"
