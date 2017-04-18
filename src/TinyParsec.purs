@@ -1,7 +1,8 @@
 module TinyParsec where
 
-import Prelude
+import Prelude hiding (zero)
 import Data.List (List(..), (:), singleton, concat, concatMap)
+import Data.Int (fromString)
 import Data.Tuple (Tuple(..))
 import Data.String as S
 import Data.Maybe (Maybe(..))
@@ -122,3 +123,10 @@ apply1 p s = parse
                 (do
                 _ <- space
                 p) s
+
+intParser :: Parser Int
+intParser = do
+    x <- token (sat isDigit)
+    case (fromString (S.singleton x)) of
+         Nothing -> zero
+         Just a -> pure a
