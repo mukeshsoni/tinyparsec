@@ -21,7 +21,9 @@ data JsonVal
     | JsonObj (List (Tuple String JsonVal))
 
 jsonValParser
-    = jsonIntParser <|> jsonBoolParser <|> jsonStringParser <|> jsonObjParser
+    = do
+        _ <- pure 1
+        jsonIntParser <|> jsonBoolParser <|> jsonStringParser <|> jsonObjParser
 
 propValParser :: Parser (Tuple String JsonVal)
 propValParser = do
@@ -31,9 +33,11 @@ propValParser = do
     pure (Tuple prop val)
 
 listOfPropValParser :: Parser (List (Tuple String JsonVal))
-listOfPropValParser = sepBy propValParser (symb ",")
+listOfPropValParser = do
+    _ <- pure 1 
+    sepBy propValParser (symb ",")
 
--- jsonObjParser = jsonIntParser
+{--jsonObjParser = jsonIntParser--}
 --jsonObjParser :: Parser JsonVal
 jsonObjParser = do
     _ <- symb "{"
