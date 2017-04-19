@@ -1,7 +1,8 @@
 module TinyParsec where
 
 import Prelude hiding (zero)
-import Data.List (List(..), (:), singleton, concat, concatMap)
+import Data.List (List(..), (:), singleton, concat, concatMap, fromFoldable)
+import Data.Array as A
 import Data.Int (fromString)
 import Data.Tuple (Tuple(..))
 import Data.String as S
@@ -126,7 +127,7 @@ apply1 p s = parse
 
 intParser :: Parser Int
 intParser = do
-    x <- token (sat isDigit)
-    case (fromString (S.singleton x)) of
+    x <- many1 (token (sat isDigit))
+    case (fromString (S.fromCharArray (A.fromFoldable x))) of
          Nothing -> zero
          Just a -> pure a

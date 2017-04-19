@@ -73,10 +73,10 @@ boolParser = (do
 jsonBoolParser :: Parser JsonVal
 jsonBoolParser = map JsonBool boolParser
 instance showJsonVal :: Show JsonVal where
-    show (JsonInt x) = show x
-    show (JsonString s) = s
-    show (JsonBool b) = show b
-    show (JsonObj o) = show o
+    show (JsonInt x) = "JsonInt " <> show x
+    show (JsonString s) = "JsonString " <> s
+    show (JsonBool b) = "JsonBool " <> show b
+    show (JsonObj o) = "JsonObj " <> show o
 
 
 
