@@ -28,17 +28,23 @@ exprInsideBrackets = do
     pure out
 
 factor :: Parser ArithExpr
-factor = intParserForArithExpr
+factor = do
+    _ <- pure 1
+    intParserForArithExpr <|> exprInsideBrackets
 
 term :: Parser ArithExpr
-term = factor `chainl1` mulOp
+term = do
+    _ <- pure 1
+    factor `chainl1` mulOp
 
 mulOp = do
     _ <- symb "*"
     pure MulOp
 
 expr :: Parser ArithExpr
-expr = term `chainl1` plusOp
+expr = do
+    _ <- pure 1
+    term `chainl1` plusOp
 
 plusOp = (do
          _ <- symb "+"
@@ -49,7 +55,7 @@ plusOp = (do
 
 instance showArithExpr :: Show ArithExpr where
     show (PlusOp x y) = "PlusOp " <> show x <> " " <> show y
-    show (MinusOp x y) = "MinuxOp " <> show x <> " " <> show y
+    show (MinusOp x y) = "MinusOp " <> show x <> " " <> show y
     show (MulOp x y) = "MulOp " <> show x <> " " <> show y
     show (LitInt x) = show x
 
