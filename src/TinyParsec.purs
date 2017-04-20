@@ -7,6 +7,7 @@ import Data.Int (fromString)
 import Data.Tuple (Tuple(..))
 import Data.String as S
 import Data.Maybe (Maybe(..))
+import Data.Either
 import Control.Alt
 import Data.Eulalie.Char.Predicates
 
@@ -14,6 +15,15 @@ newtype Parser a = Parser (String -> List (Tuple a String))
 
 parse :: forall a. Parser a -> String -> List (Tuple a String) 
 parse (Parser p) s = p s 
+
+parseWithErrorMessage :: forall a. Parser a -> String -> Either String (List (Tuple a String))
+parseWithErrorMessage (Parser p) s =
+    let
+        out = p s
+    in
+        case out of
+             Nil -> Left ("error parsing " <> s)
+             _ -> Right out
 
 item :: Parser Char
 item = Parser (\s ->

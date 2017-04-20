@@ -19,11 +19,19 @@ data JsonVal
     | JsonString String
     | JsonBool Boolean
     | JsonObj (List (Tuple String JsonVal))
+    | JsonArray (List JsonVal)
 
 jsonValParser
     = do
         _ <- pure 1
-        jsonIntParser <|> jsonBoolParser <|> jsonStringParser <|> jsonObjParser
+        jsonIntParser <|> jsonBoolParser <|> jsonStringParser <|> jsonObjParser <|> jsonArray
+
+jsonArray :: Parser JsonVal
+jsonArray = do
+    _ <- symb "["
+    arr <- sepBy jsonValParser (symb ",")
+    _ <- symb "]"
+    pure (JsonArray arr)
 
 propValParser :: Parser (Tuple String JsonVal)
 propValParser = do
@@ -77,6 +85,7 @@ instance showJsonVal :: Show JsonVal where
     show (JsonString s) = "JsonString " <> s
     show (JsonBool b) = "JsonBool " <> show b
     show (JsonObj o) = "JsonObj " <> show o
+    show (JsonArray a) = "JsonArray " <> show a
 
 
 
